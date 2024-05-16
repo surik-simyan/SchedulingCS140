@@ -1,5 +1,8 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
 import javax.swing.*;
 
 public class TimeTable extends JFrame implements ActionListener {
@@ -9,6 +12,8 @@ public class TimeTable extends JFrame implements ActionListener {
     private JTextField field[];
     private CourseArray courses;
     private Color CRScolor[] = {Color.RED, Color.GREEN, Color.BLACK};
+
+    private Autoassociator autoassociator;
 
     public TimeTable() {
         super("Dynamic Time Table");
@@ -76,9 +81,11 @@ public class TimeTable extends JFrame implements ActionListener {
                 int slots = Integer.parseInt(field[0].getText());
                 courses = new CourseArray(Integer.parseInt(field[1].getText()) + 1, slots);
                 courses.readClashes(field[2].getText());
+                autoassociator = new Autoassociator(courses);
                 draw();
                 break;
             case 1:
+                trainAutoassociator();
                 min = Integer.MAX_VALUE;
                 step = 0;
                 for (int i = 1; i < courses.length(); i++) courses.setSlot(i, 0);
@@ -121,6 +128,33 @@ public class TimeTable extends JFrame implements ActionListener {
                 break;
             case 5:
                 System.exit(0);
+        }
+    }
+
+    private void trainAutoassociator() {
+        int[] clashFreeSlots = findClashFreeSlots();
+        autoassociator.training(clashFreeSlots);
+
+        saveLog(clashFreeSlots);
+    }
+
+    private int[] findClashFreeSlots() {
+        int[] clashFreeSlots = {1, 2, 3, 4};
+        return clashFreeSlots;
+    }
+
+    private void saveLog(int[] clashFreeSlots) {
+        try (FileWriter writer = new FileWriter("timeslots.txt")) {
+            writer.write("Number of slots: " + field[0].getText() + "\n");
+            writer.write("Shift: " + field[4].getText() + "\n");
+            writer.write("Iteration index: " + field[3].getText() + "\n");
+
+            writer.write("Timeslot index: ");
+            for (int i = 0; i < clashFreeSlots.length; i++) {
+                writer.write(clashFreeSlots[i] + " ");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

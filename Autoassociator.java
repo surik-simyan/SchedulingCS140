@@ -1,43 +1,58 @@
+import java.util.Arrays;
+
 public class Autoassociator {
 	private int weights[][];
 	private int trainingCapacity;
 	
 	public Autoassociator(CourseArray courses) {
-		// TO DO
-		// creates a new Hopfield network with the same number of neurons 
-		// as the number of courses in the input CourseArray
+		int numCourses = courses.length();
+		weights = new int[numCourses][numCourses];
+		trainingCapacity = (int) (0.138 * numCourses); // Hebbian rule capacity
+		for (int i = 0; i < numCourses; i++) {
+			for (int j = i; j < numCourses; j++) {
+				weights[i][j] = weights[j][i] = 0;
+			}
+		}
 	}
 	
 	public int getTrainingCapacity() {
-		// TO DO
-		
-		return 0;
+		return trainingCapacity;
 	}
 	
 	public void training(int pattern[]) {
-		// TO DO
+		for (int i = 0; i < pattern.length; i++) {
+			for (int j = i; j < pattern.length; j++) {
+				weights[i][j] += pattern[i] * pattern[j];
+				weights[j][i] = weights[i][j];
+			}
+		}
 	}
 	
 	public int unitUpdate(int neurons[]) {
-		// TO DO
-		// implements a single update step and
-		// returns the index of the randomly selected and updated neuron
-		
-		return 0;
+		int index = (int) (Math.random() * neurons.length);
+		unitUpdate(neurons, index);
+		return index;
 	}
 	
 	public void unitUpdate(int neurons[], int index) {
-		// TO DO
-		// implements the update step of a single neuron specified by index
+		int activation = 0;
+		for (int i = 0; i < neurons.length; i++) {
+			activation += weights[index][i] * neurons[i];
+		}
+		neurons[index] = (activation >= 0) ? 1 : -1;
 	}
 	
 	public void chainUpdate(int neurons[], int steps) {
-		// TO DO
-		// implements the specified number od update steps
+		for (int i = 0; i < steps; i++) {
+			unitUpdate(neurons);
+		}
 	}
 	
 	public void fullUpdate(int neurons[]) {
-		// TO DO
-		// updates the input until the final state achieved
+		int[] previousState = neurons.clone();
+		do {
+			previousState = neurons.clone();
+			chainUpdate(neurons, neurons.length);
+		} while (!Arrays.equals(neurons, previousState));
 	}
 }
