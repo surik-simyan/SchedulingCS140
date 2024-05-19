@@ -5,7 +5,7 @@ public class Autoassociator {
 	private int trainingCapacity;
 	
 	public Autoassociator(CourseArray courses) {
-		int numCourses = courses.length();
+		int numCourses = courses.length() - 1;
 		weights = new int[numCourses][numCourses];
 		trainingCapacity = (int) (0.138 * numCourses); // Hebbian rule capacity
 		for (int i = 0; i < numCourses; i++) {
